@@ -1,0 +1,128 @@
+int ballX = 400;
+int ballY = 300;
+int ballD = 20;
+int stepX = 5;
+int stepY = 5;
+int     a = 18;  //ブロックの横の数
+int     X = 500; //ボードのX座標
+int     Y = 500; //ボードのY座標
+int step  = 20;  //ボードの速さ  
+int len1  = 150; //ボードの長さ
+int len2  = 50;  //ブロックの辺の長さ
+int cnt   = 0;
+boolean[] blocks = new boolean[5*a];
+
+color ballCol = color(200);
+color bgCol   = color(255);
+
+void setup() {
+  size(900, 600);
+
+  for (int i = 0; i < blocks.length; i++) {
+    blocks[i] = true;
+  }
+}
+
+void draw() {
+  background(bgCol);
+
+  for (int n = 0; len2*(n + 1) <= width; n++) {
+    for (int m = 0; len2*(m + 1) <= height/3; m++) {
+
+      if (blocks[n + a*m] == true) {
+        fill(200, 200, 255);
+        rect(n*len2, m*len2, len2, len2);
+
+        if (n*len2 < ballX && ballX < (n + 1)*len2 && (ballY + ballD/2 == m*len2 || ballY - ballD/2 == (m + 1)*len2)) {
+          stepY *= -1;
+          blocks[n + a*m] = false;
+        }
+
+        if (m*len2 < ballY && ballY < (m + 1)*len2 && (ballX + ballD/2 == n*len2 || ballX - ballD/2 == (n + 1)*len2)) {
+          stepX *= -1;
+          blocks[n + a*m] = false;
+        } 
+
+        if (ballX == (n + 1)*len2 && (ballY + ballD/2 == m*len2 || ballY - ballD/2 == (m + 1)*len2)) {
+          stepY *= -1;
+          blocks[n + a*m] = false;
+          blocks[n + a*m + 1] = false;
+        }
+
+        if (ballY == (m + 1)*len2 && (ballX + ballD/2 == n*len2 || ballX - ballD/2 == (n + 1)*len2)) {
+          stepX *= -1;
+          blocks[n + a*m] = false;
+          blocks[n + a*(m + 1)] = false;
+        }
+
+        if ((dist(ballX, ballY, n*len2, m*len2) <= ballD/2 && ballX != m*len2 && ballY != n*len2) ||
+          (dist(ballX, ballY, n*len2, (m + 1)*len2) <= ballD/2 && ballX != m*len2 && ballY != (m + 1)*len2) ||
+          (dist(ballX, ballY, (n + 1)*len2, (m + 1)*len2) <= ballD/2 && ballX != (n + 1)*len2 && ballY != (m + 1)*len2) ||
+          (dist(ballX, ballY, (n + 1)*len2, m*len2) <= ballD/2 && ballX != (n + 1)*len2 && ballY != m*len2)) {
+          stepX *= -1;
+          stepY *= -1;
+          blocks[n + a*m] = false;
+        }
+      }
+    }
+  }
+
+
+  if (ballX + ballD / 2 >= width || ballX - ballD / 2 <= 0) {
+    stepX *= -1;
+  }
+  if (ballY - ballD / 2 <= 0) {
+    stepY *= -1;
+  }
+  if (ballX <= X + len1 && ballX >= X && ballY + ballD / 2 == Y) {
+    stepY *= -1;
+    /*if (keyPressed) {
+      if (key == 'x') {
+        stepX += 1;
+      } else if (key == 'z') {
+        stepX -= 1;
+      }
+    }*/
+  }
+
+
+  if (X >= 0 && X < width - len1) {
+    if (keyPressed) {
+      if (key == 'x') {
+        X += step;
+      }
+    }
+  }
+
+  if (X > 0 && X <= width) {
+    if (keyPressed) {
+      if (key == 'z') {
+        X -= step;
+      }
+    }
+  }
+  cnt++;
+
+  if (ballY  >= height + ballD / 2) {
+    fill(0);
+    textSize(100);
+    text("GAME OVER", 150, 400);
+  }
+  if(cnt >= 9370) {
+    fill(0);
+    textSize(100);
+    text("CLEAR",300,200);
+  }
+  if(cnt <= 9370) {
+    ballX += stepX;
+  }
+  ballY += stepY;
+
+  strokeWeight(5);
+  stroke(0);
+  line(X, Y, X + len1, Y);
+  fill(ballCol);
+  if(cnt <= 9370) {
+    ellipse(ballX, ballY, ballD, ballD);
+  }
+}
